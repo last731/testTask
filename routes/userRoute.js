@@ -1,7 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let User = require('../models/userModel.js');
-
+//get all users
 router.get('/', function(req, res) {
     User.find({}, (err, docs) => {
         if (err) {
@@ -11,20 +11,5 @@ router.get('/', function(req, res) {
         }
     })
 });
-
-router.put('/', function(req, res) {
-    let user = new User();
-    for (name in req.body) {
-        user[name] = req.body[name];
-    }
-    user.save((err) => {
-        if (err) {
-            res.send("Cant save, some error on server");
-        } else {
-            res.send("OK");
-        }
-    })
-});
-
 
 module.exports = router;

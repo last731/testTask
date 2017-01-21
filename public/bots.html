@@ -21,11 +21,12 @@
         app.controller("myCtrl", function($scope, $http) {
 
             $scope.addBot = function() {
+
                 let bot = {
-                    token: new Date().getTime(),
+                    token: prompt("Введите токен"),
                     name: 'default'
                 }
-                $http.put("/bots", bot);
+                $http.post("/bots", bot);
                 $scope.myData.push(bot);
                 for (var i = 0; i < $scope.myData.length; i++) {
                     $scope.$watch('myData[' + i + ']', function(changed) {

@@ -28,17 +28,24 @@
         <div class="usersDiv">
             <ul>
                 <li class="userList" ng-repeat="x in myData">
-                    <p ng-click="showUserInfo(x)" ng-model="x.name"> {{x.name}}</p>
+                    <p ng-click="showUserInfo(x)" ng-model="x.userProfile.name"> {{x.userProfile.name}}</p>
                 </li>
             </ul>
             <ul>
-                <li ng-repeat="(key, value) in currentUser">{{key+" : "+value}}</li>
+                <li>Профиль пользователя:</li>
+                <li><img src="{{currentUser.userProfile.avatar}}" /></li>
+                <li>{{"Имя : "+currentUser.userProfile.name}}</li>
+                <li>{{"Язык : "+currentUser.userProfile.language}}</li>
+                <li>{{"Страна : "+currentUser.userProfile.country}}</li>
+
+                <li>{{"Добавлен : "+currentUser.created}}</li>
+                <li>{{"Имя связанного бота : "+linkedBotName}}</li>
             </ul>
         </div>
 
         <div class="chatDiv">
             <ul>
-                <li ng-repeat="x in messages">{{x.time +" "+x.who +":"+x.text}}</li>
+                <li ng-repeat="x in messages">{{x.timestamp +" "+x.from +":"+x.text}}</li>
             </ul>
             <input type="text" ng-model="messageText">
             <input type="submit" ng-click="sendMessage()">
@@ -60,6 +67,9 @@
                 });
                 $http.get("/history/" + user.linkedBotToken + "/" + user.token).then(function(response) {
                     console.log(response.data.messages);
+                    response.data.messages.forEach((message) => {
+                        message.timestamp = new Date(message.timestamp);
+                    })
                     $scope.messages = response.data.messages;
                 });
             }
@@ -70,10 +80,9 @@
                     who: $scope.linkedBotName,
                     text: $scope.messageText
                 })
-                $http.put("/history/" +
+                $http.put("/bots/" +
                     $scope.currentUser.linkedBotToken +
                     "/" + $scope.currentUser.token, {
-                        who: $scope.linkedBotName,
                         text: $scope.messageText
                     });
             }

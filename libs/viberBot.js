@@ -14,28 +14,12 @@ module.exports = function(authToken, botName, router) {
 
 
     bot.onConversationStarted((userProfile, onFinish) => {
-        User.findOne({
-            token: userProfile.id
-        }, (err, user) => {
-            if (err) {
-
-            } else {
-                if (!user) {
-                    let user = new User({
-                        token: userProfile.id,
-                        linkedBotToken: bot.authToken,
-                        userProfile: userProfile
-                    })
-                    user.save((err) => {
-                        if (err) console.log(err);
-                    })
-                }
-            }
-        })
+        checkUser(userProfile, bot.authToken);
         onFinish(new TextMessage(`Hi, ${userProfile.name}! Nice to meet you.`))
     });
 
     bot.on(BotEvents.MESSAGE_RECEIVED, (message, response) => {
+        checkUser(response.userProfile, bot.authToken);
         History.findOne({
             botToken: bot.authToken,
             userToken: response.userProfile.id
@@ -106,9 +90,32 @@ module.exports = function(authToken, botName, router) {
         })
     }
 
+
+
     let now = new Date().getTime();
 
     bot.setWebhook(process.env.link + "/bots/viber/" + now);
     router.use("/viber/" + now, bot.middleware());
     return bot;
+}
+
+function checkUser(userProfile, botToken) {
+    User.findOne({
+        token: userProfile.id
+    }, (err, user) => {
+        if (err) {
+
+        } else {
+            if (!user) {
+                let user = new User({
+                    token: userProfile.id,
+                    linkedBotToken: botToken,
+                    userProfile: userProfile
+                })
+                user.save((err) => {
+                    if (err) console.log(err);
+                })
+            }
+        }
+    })
 }
